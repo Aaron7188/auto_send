@@ -71,7 +71,7 @@
                 <input type="number" id="count" name="count" class="form-control" required>
             </div>
             <div class="form-group">
-                <label for="interval">Interval (ms):</label>
+                <label for="interval">Interval (hours):</label>
                 <input type="number" id="interval" name="interval" class="form-control" required>
             </div>
             <button type="button" class="btn btn-success" onclick="sendTweets()">Send</button>
@@ -82,15 +82,6 @@
         function sendTweets() {
             const form = document.getElementById('send-tweets-form');
             const formData = new FormData(form);
-
-            // Optional: handle empty fields
-            if (!formData.get('country')) {
-                formData.set('country', '');
-            }
-            if (!formData.get('category')) {
-                formData.set('category', '');
-            }
-
             fetch('/send-tweets', {
                 method: 'POST',
                 body: formData
