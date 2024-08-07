@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Auto Send Tweets</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        .container {
+            max-width: 600px;
+        }
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Auto Send Tweets</h1>
+
+        <h2>Upload Users</h2>
+        <form action="/upload/users" method="post" enctype="multipart/form-data" class="form-inline justify-content-center">
+            <div class="form-group">
+                <input type="file" name="file" class="form-control-file">
+            </div>
+            <button type="submit" class="btn btn-primary ml-2">Upload</button>
+        </form>
+
+        <h2>Upload Channels</h2>
+        <form action="/upload/channels" method="post" enctype="multipart/form-data" class="form-inline justify-content-center">
+            <div class="form-group">
+                <input type="file" name="file" class="form-control-file">
+            </div>
+            <button type="submit" class="btn btn-primary ml-2">Upload</button>
+        </form>
+
+        <h2>Send Tweets</h2>
+        <form id="send-tweets-form" class="form">
+            <div class="form-group">
+                <label for="country">Country:</label>
+                <input type="text" id="country" name="country" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <input type="text" id="category" name="category" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="count">Count:</label>
+                <input type="number" id="count" name="count" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="interval">Interval (ms):</label>
+                <input type="number" id="interval" name="interval" class="form-control">
+            </div>
+            <button type="button" class="btn btn-success" onclick="sendTweets()">Send</button>
+        </form>
+    </div>
+
+    <script>
+        function sendTweets() {
+            const form = document.getElementById('send-tweets-form');
+            const formData = new FormData(form);
+            fetch('/send-tweets', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
