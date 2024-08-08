@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Auto Send Tweets</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <style>
         body {
             padding-top: 50px;
@@ -26,7 +27,7 @@
         <h1>Auto Send Tweets</h1>
 
         <h2>Upload Users</h2>
-        <form action="/upload/users" method="post" enctype="multipart/form-data" class="form-inline justify-content-center">
+        <form id="upload-users-form" action="/upload/users" method="post" enctype="multipart/form-data" class="form-inline justify-content-center">
             <div class="form-group">
                 <input type="file" name="file" class="form-control-file">
             </div>
@@ -34,7 +35,7 @@
         </form>
 
         <h2>Upload Channels</h2>
-        <form action="/upload/channels" method="post" enctype="multipart/form-data" class="form-inline justify-content-center">
+        <form id="upload-channels-form" action="/upload/channels" method="post" enctype="multipart/form-data" class="form-inline justify-content-center">
             <div class="form-group">
                 <input type="file" name="file" class="form-control-file">
             </div>
@@ -47,7 +48,8 @@
                 <label for="country">Country:</label>
                 <select id="country" name="country" class="form-control">
                     <option value="">Select Country</option>
-                    <option value="China">China</option>
+                    <option value="cn">China</option>
+                    <option value="en">China</option>
                     <option value="UK">UK</option>
                     <option value="Turkey">Turkey</option>
                     <option value="Brazil">Brazil</option>
@@ -63,6 +65,7 @@
                     <option value="Sports">Sports</option>
                     <option value="Fishing">Fishing</option>
                     <option value="Games">Games</option>
+                    <option value="gold">gold</option>
                     <option value="Entertainment">Entertainment</option>
                 </select>
             </div>
@@ -78,8 +81,79 @@
         </form>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
+        // Toastr options
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+        // Handle user upload form submission
+        document.getElementById('upload-users-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the default way
+            const form = event.target;
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    toastr.success(data.message, 'Success');
+                } else {
+                    toastr.error('Unexpected response format', 'Error');
+                }
+            })
+            .catch(error => {
+                toastr.error('Failed to upload users', 'Error');
+                console.error('Error:', error);
+            });
+        });
+
+        // Handle channel upload form submission
+        document.getElementById('upload-channels-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the default way
+            const form = event.target;
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    toastr.success(data.message, 'Success');
+                } else {
+                    toastr.error('Unexpected response format', 'Error');
+                }
+            })
+            .catch(error => {
+                toastr.error('Failed to upload channels', 'Error');
+                console.error('Error:', error);
+            });
+        });
+
+        // Handle send tweets button click
         function sendTweets() {
+            toastr.info('Sending tweets...', 'Info');
             const form = document.getElementById('send-tweets-form');
             const formData = new FormData(form);
             fetch('/send-tweets', {
@@ -87,12 +161,18 @@
                 body: formData
             })
             .then(response => response.json())
-            .then(data => alert(data.message))
-            .catch(error => console.error('Error:', error));
+            .then(data => {
+                if (data.message) {
+                    toastr.success(data.message, 'Success');
+                } else {
+                    toastr.error('Unexpected response format', 'Error');
+                }
+            })
+            .catch(error => {
+                toastr.error('Failed to send tweets', 'Error');
+                console.error('Error:', error);
+            });
         }
     </script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

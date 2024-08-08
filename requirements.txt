@@ -5,3 +5,5 @@ requests
 APScheduler
 python-telegram-bot
 mysqlclient
+chardet
+pandas
