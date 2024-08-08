@@ -1,6 +1,6 @@
 import chardet
 import pandas as pd
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, current_app
 from app import db, scheduler
 from app.models import User, Channel, Tweet
 from app.utils import insert_users_to_db, insert_channels_to_db, send_message_to_channel
@@ -106,14 +106,22 @@ def send_tweets():
             channels_query = channels_query.filter_by(category=category)
         channels = channels_query.all()
 
-        # 定时发送推文到相应的频道
-        for i, tweet in enumerate(tweets):
-            # 计算发送时间，interval是小时，所以乘以3600转换为秒
+
+        if not tweets:
+            return jsonify({"message": "No tweets available to send"}), 400
+
+        # 立即发送第一条推文
+        first_tweet = tweets[0]
+        send_message_to_channel(first_tweet, channels, current_app._get_current_object())
+
+        # 定时发送剩余的推文
+        for i, tweet in enumerate(tweets[1:], start=1):
             send_time = datetime.datetime.now() + datetime.timedelta(seconds=interval * 3600 * i)
-            scheduler.add_job(send_message_to_channel, 'date', run_date=send_time, args=[tweet, channels])
+            scheduler.add_job(send_message_to_channel, 'date', run_date=send_time,
+                              args=[tweet, channels, current_app._get_current_object()])
 
         return jsonify({"message": "Tweets are being sent"}), 200
     except Exception as e:
-        # 记录错误日志
+        # 打印异常和调试信息
         print(f"Error sending tweets: {e}")
         return jsonify({"message": "Failed to send tweets"}), 500
